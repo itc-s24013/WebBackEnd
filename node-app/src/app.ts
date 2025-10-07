@@ -1,10 +1,9 @@
 import http from "node:http"; // httpを使えるようにするよ
 import pug from 'pug';
 import url from 'node:url'
-import fs from 'node:fs/promises'
 
 const index_template = pug.compileFile('./index.pug') // ファイルはここで読み込む
-const style_css = await fs.readFile('style.css', 'utf8')
+const other_template = pug.compileFile('./other.pug')
 
 const server = http.createServer(getFromClient)
 
@@ -30,10 +29,14 @@ async function getFromClient(req: http.IncomingMessage, res: http.ServerResponse
             break
         }
 
-        case '/style.css': {
-            // スタイルシート(style.css)にアクセスが来た時
-            res.writeHead(200, {'Content-Type': 'text/css; charset=utf-8'})
-            res.write(style_css)
+        case '/other': {
+            // Index(トップページにアクセスが来た時
+            const content = other_template({
+                title: 'Other',
+                content: 'これは新しく用意したページです。'
+            })
+            res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
+            res.write(content)
             res.end()
             break
         }
