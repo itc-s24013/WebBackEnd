@@ -1,6 +1,8 @@
 import http from "node:http"; // httpを使えるようにするよ
 import pug from 'pug';
 import url from 'node:url'
+import fs from 'node:fs/promises';
+import qs from 'node:querystring'
 
 const index_template = pug.compileFile('./index.pug') // ファイルはここで読み込む
 const other_template = pug.compileFile('./other.pug')
@@ -10,6 +12,13 @@ const server = http.createServer(getFromClient)
 server.listen(3210);
 console.log('Server start!') // サーバー側に出力される
 
+const data = {
+    'Taro': '09-999-999',
+    'Hanako': '080-888-888',
+    'Sachiko': '070-777-777',
+    'Ichiro:': '060-666-666'
+}
+
 // ここまでメインプログラム===================
 
 // createServer の処理
@@ -18,26 +27,12 @@ async function getFromClient(req: http.IncomingMessage, res: http.ServerResponse
 
     switch (url_parts.pathname) {
         case '/': {
-            // Index(トップページにアクセスが来た時
-            const content = index_template({
-                title: 'Indexページ',
-                content: 'これはテンプレートを使ったシンプルなサンプルページです。'
-            })
-            res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
-            res.write(content)
-            res.end()
+            await response_index(req, res)
             break
         }
 
         case '/other': {
-            // Index(トップページにアクセスが来た時
-            const content = other_template({
-                title: 'Other',
-                content: 'これは新しく用意したページです。'
-            })
-            res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
-            res.write(content)
-            res.end()
+            await response_other(req, res)
             break
         }
 
@@ -54,4 +49,54 @@ async function getFromClient(req: http.IncomingMessage, res: http.ServerResponse
         content: 'これはテンプレートを使ったシンプルなサンプルページです。'
     })
     */
+}
+
+async function response_index(req:http.IncomingMessage, res:http.ServerResponse) {
+    const msg = 'これはIndexページです。'
+    const content = index_template({
+        title: 'Index',
+        content: msg,
+        data
+    })
+    res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
+    res.write(content)
+    res.end()
+}
+
+async function response_other(req:http.IncomingMessage, res:http.ServerResponse) {
+    let msg = 'これはOtherページです。'
+
+    if (req.method === 'POST') {
+        const post_data = await (new Promise<qs.ParsedUrlQuery>((resolve,reject) => {
+            let body = ''
+            req.on('data', (chunk) => { // 少しずつ受け取ったデータをchunkとしてbodyに追加する
+                body += chunk
+            })
+            req.on('end', () => {
+                try {
+                    resolve(qs.parse(body)) // データを整える
+                } catch (e) {
+                    console.error(e)
+                    reject(e)
+                }
+            })
+        }))
+        msg += `あなたは「${post_data.msg}」と書きました`
+        const content = other_template({
+            title: 'Other',
+            content: msg,
+        })
+        res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
+        res.write(content)
+        res.end()
+    } else {
+        // POST以外のアクセス
+        const content = other_template({
+            title: 'Other',
+            content: 'ページがありません',
+        })
+        res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
+        res.write(content)
+        res.end()
+    }
 }
