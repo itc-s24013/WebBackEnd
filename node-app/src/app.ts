@@ -12,11 +12,9 @@ const server = http.createServer(getFromClient)
 server.listen(3210);
 console.log('Server start!') // サーバー側に出力される
 
+// msgを表示する設定にしているのでmsgを設定しないと何も表示されない
 const data = {
-    'Taro': '09-999-999',
-    'Hanako': '080-888-888',
-    'Sachiko': '070-777-777',
-    'Ichiro:': '060-666-666'
+    msg: 'no message...'
 }
 
 // ここまでメインプログラム===================
@@ -52,15 +50,19 @@ async function getFromClient(req: http.IncomingMessage, res: http.ServerResponse
 }
 
 async function response_index(req:http.IncomingMessage, res:http.ServerResponse) {
-    const msg = 'これはIndexページです。'
-    const content = index_template({
-        title: 'Index',
-        content: msg,
-        data
-    })
-    res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
-    res.write(content)
-    res.end()
+    if (req.method === 'POST') {
+        // POSTアクセス時の処理
+        const post_data = await parse_body(req)
+        data.msg = post_data.msg as string
+
+        // リダイレクトする(ここでリダイレクトをすることでPOSTアクセスの再送を防げる)
+        res.writeHead(302, 'Found', {
+            'Location':'/', // '/'のファイルに移行する
+        })
+        res.end()
+    } else {
+        write_index(req, res)
+    }
 }
 
 async function response_other(req:http.IncomingMessage, res:http.ServerResponse) {
@@ -99,4 +101,27 @@ async function response_other(req:http.IncomingMessage, res:http.ServerResponse)
         res.write(content)
         res.end()
     }
+}
+
+function parse_body(req: http.IncomingMessage): Promise<qs.ParsedUrlQuery> {
+    return new Promise((resolve, reject) => {
+        let body = ''
+        req.on('data', (chunk) => {
+            body += chunk
+        })
+        req.on('end', () => {
+            resolve(qs.parse(body))
+        })
+    })
+}
+
+function write_index(req: http.IncomingMessage, res:http.ServerResponse) {
+    const content = index_template({
+        title: 'Index',
+        content: '※伝言を表示します',
+        data
+    })
+    res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
+    res.write(content)
+    res.end()
 }
