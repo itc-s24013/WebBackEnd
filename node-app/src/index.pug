@@ -23,6 +23,7 @@ html(lang="ja")
                             border-b dark:border-gray-700 border-gray-200`)
                             td(class=`px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white`)
                                 = data['msg']
+            p.mt-4 your last message: #{cookie_data['msg']}
             .w-full.mt-4
                 form(method='post' action='/' class='mx-auto')
                     .mb-4

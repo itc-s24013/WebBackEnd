@@ -55,6 +55,8 @@ async function response_index(req:http.IncomingMessage, res:http.ServerResponse)
         const post_data = await parse_body(req)
         data.msg = post_data.msg as string
 
+        setCookie('msg', data.msg, res)
+
         // リダイレクトする(ここでリダイレクトをすることでPOSTアクセスの再送を防げる)
         res.writeHead(302, 'Found', {
             'Location':'/', // '/'のファイルに移行する
@@ -116,12 +118,33 @@ function parse_body(req: http.IncomingMessage): Promise<qs.ParsedUrlQuery> {
 }
 
 function write_index(req: http.IncomingMessage, res:http.ServerResponse) {
+    const cookie_data = getCookie(req)
     const content = index_template({
         title: 'Index',
         content: '※伝言を表示します',
-        data
+        data,
+        cookie_data
     })
     res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
     res.write(content)
     res.end()
+}
+
+function setCookie(key: string, value: string, res: http.ServerResponse) {
+    const encoded_cookie = qs.stringify({[key]: value})
+    res.setHeader('Set-Cookie', [encoded_cookie])
+}
+
+function getCookie(req:http.IncomingMessage) {
+    const cookie_data = req.headers.cookie != undefined
+        ? req.headers.cookie : ''
+    const data = cookie_data.split(';')
+        .map(raw_cookie => qs.parse(raw_cookie.trim()))
+        // ({})となっているのはアロー関数にしているせいで{}だけではオブジェクトではなく関数だと解釈されてしまうのを防ぐため
+        .reduce((acc, cookie) => ({...acc, ...cookie}) )
+
+    // 最初は左のデータよりも見づらいのをqs.parseで左のデータにしている
+    // .reduceを使うことで左のデータが右のデータになる
+    // [ {msg: 'hoge'}, {date: '2025-10-09'}] → { msg: 'hoge', date: '2025-10-09' }
+    return data
 }
