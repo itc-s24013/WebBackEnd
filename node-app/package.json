@@ -1,0 +1,20 @@
+{
+  "name": "node-app",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@tsconfig/node-lts": "^22.0.2",
+    "@types/node": "^22.18.8",
+    "@types/pug": "^2.0.10",
+    "typescript": "^5.5.3"
+  },
+  "private": true,
+  "dependencies": {
+    "pug": "^3.0.3"
+  }
+}
