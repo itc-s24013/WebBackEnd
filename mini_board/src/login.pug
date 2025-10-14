@@ -1,0 +1,35 @@
+doctype html
+html(lang='ja')
+    head
+        meta(charset='UTF-8')
+        title ミニメッセージボード
+        script(src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4")
+        script.
+            document.addEventListener('DOMContentLoaded', () => {
+                // ページが読み込み終わって操作が可能になったら↓は実行される
+                document.querySelector('#submit_button')
+                    .addEventListener('click', () => {
+                        // 送信ボタンがクリックされたときに↓は実行される
+                        const id = document.querySelector('#id_input').value;
+                        localStorage.setItem('id',id)
+                        location.href = '/';
+                    });
+            });
+    body(class='container mx-auto bg-white dark:bg-gray-950 dark:text-white')
+        header
+            h1(class='text-5xl/14 font-light mb-4') メッセージボード
+        main
+            p あなたのログインネームを入力ください。
+            .w-full.mt-4
+                .mx-auto
+                    .mb-4
+                        label(for='id_input' class='block mb-2 text-sm font-medium') Login name:
+                        input(type='text' class=`shadow appearance-none border rounded
+                            w-full py-2 px-3 leading-tight focus:outline-none
+                            focus:shadow-outline`
+                        )#id_input
+
+                    button(type='submit' class=`text-white bg-blue-700 hover:bg-blue-800
+                    focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium
+                    rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center
+                    dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800`)#submit_button 送信

@@ -1,0 +1,14 @@
+mixin data_item(data)
+    table(class=`w-full text-sm text-left rtl:text-right text-gray-700 dark:text-gray-200`)
+        thead(class=`text-base text-gray-800 uppercase bg-gray-300 dark:bg-gray-500 dark:text-gray-200`)
+            tr
+                th(scope='col' class='px-6 py-3 w-1/4') id
+                th(scope='col' class='px-6 py-3 w-1/4') message
+        tbody
+            each val in data
+                tr(class=`odd:bg-white odd:dark:bg-gray-900 even:bg-gray-100 even:dark:bg-gray-700 border-b dark:border-gray-700 border-gray200`)
+                    th(scope='row' class=`px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white`)= val['id']
+                    td(class='px-6 py-4')= val['msg']
+            else
+                tr(class=`odd:bg-white odd:dark:bg-gray-900 even:bg-gray-100 even:dark:bg-gray-700 border-b dark:border-gray-700 border-gray200`)
+                    th(scope='row' class=`px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white`) まだ投稿がありません
