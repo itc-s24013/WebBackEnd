@@ -1,6 +1,15 @@
 import express, { Router } from 'express'
+import axios from "axios";
+import { XMLParser } from "fast-xml-parser";
 
 const router = Router()
+const xmlParser = new XMLParser()
+const httpClient = axios.create({
+    baseURL: 'https://news.google.com',
+    transformResponse: [
+        data => xmlParser.parse(data)
+    ]
+})
 
 declare module 'express-session' {
     interface SessionData {
@@ -9,13 +18,12 @@ declare module 'express-session' {
 }
 
 router.get('/', async (req, res, next) => {
-    const msg = req.session.message !== undefined
-        ? `Last Message: ${req.session.message}`
-        : '※何か書いて送信してください。'
-    // 条件式 ? 真の時の値 : 偽の時の値
+    const res2 = await httpClient.get('/rss?hl=ja&gl=JP&ceid=JP:ja')
+    const result = res2.data
+
     const data = {
-        title: 'Hello',
-        content: msg
+        title: 'Google News',
+        content: result.rss.channel.item
     }
     res.render('hello', data)
 })
