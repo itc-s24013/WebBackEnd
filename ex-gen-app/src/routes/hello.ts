@@ -1,41 +1,28 @@
 import express, { Router } from 'express'
-import axios from "axios";
-import { XMLParser } from "fast-xml-parser";
+import mariadb from 'mariadb'
 
 const router = Router()
-const xmlParser = new XMLParser()
-const httpClient = axios.create({
-    baseURL: 'https://news.google.com',
-    transformResponse: [
-        data => xmlParser.parse(data)
-    ]
+const db = await mariadb.createConnection({
+    host: 'localhost',
+    port: 3306,
+    user: 'root',
+    password: 'example',
+    database: 'mydb'
 })
 
-declare module 'express-session' {
-    interface SessionData {
-        message?: string
-    }
+interface MyData {
+    id: number
+    name: string
+    mail: string
+    age: number
 }
 
 router.get('/', async (req, res, next) => {
-    const res2 = await httpClient.get('/rss?hl=ja&gl=JP&ceid=JP:ja')
-    const result = res2.data
-
-    const data = {
-        title: 'Google News',
-        content: result.rss.channel.item
-    }
-    res.render('hello', data)
-})
-
-router.post('/post', async (req, res, next) => {
-    const msg = req.body.message as string | undefined
-    req.session.message = msg
-    const data = {
+    const result = await db.query<MyData>('SELECT * FROM mydata')
+    res.render('hello', {
         title: 'Hello',
-        content: `あなたは、「${msg}」と送信しました。`
-    }
-    res.render('hello', data)
+        content: result
+    })
 })
 
 export default router
