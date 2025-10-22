@@ -19,7 +19,7 @@ interface MyData {
 
 router.get('/', async (req, res, next) => {
     const result = await db.query<MyData>('SELECT * FROM mydata')
-    res.render('hello', {
+    res.render('hello/index', {
         title: 'Hello',
         content: result
     })
