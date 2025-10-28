@@ -36,9 +36,9 @@ router.get('/add', async (req, res, next) => {
 })
 
 router.post('/add',
-    check('name', 'NAME は必ず入力してください').notEmpty(),
-    check('mail','MAIL はメールアドレスを入力してください').isEmail(),
-    check('age','AGE は年齢(整数)を入力してください').isInt(),
+    check('name', 'NAME は必ず入力してください').notEmpty().escape(), // escape()をつけることでHTMLのような特殊文字を無害化することが出来る
+    check('mail','MAIL はメールアドレスを入力してください').isEmail().escape(),
+    check('age','AGE は年齢(整数)を入力してください').isInt().escape(),
     async (req, res, next) => {
         const result = validationResult(req)
         if (!result.isEmpty()) { // エラーが出た時(エラーが出てたら空になる)
