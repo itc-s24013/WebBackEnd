@@ -19,7 +19,7 @@ interface UserPrams {
 
 router.get('/', async (req: Request<{}, {}, {}, UserPrams>, res, next) => {
     const id = parseInt(req.query.id || '')
-    const users = await (id ? prisma.user.findMany({where: {id}})
+    const users = await (id ? prisma.user.findMany({where: {id}}) // {id: id} 変数名とキー名が同じ場合は省略可能
         : prisma.user.findMany())
 
     res.render('users/index', {
