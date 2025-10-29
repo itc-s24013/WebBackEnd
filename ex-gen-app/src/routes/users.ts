@@ -16,6 +16,8 @@ const prisma = new PrismaClient({adapter})
 interface UserPrams {
     id?: string
     name?: string
+    min?: string
+    max?: string
 }
 
 router.get('/', async (req: Request<{}, {}, {}, UserPrams>, res, next) => {
@@ -31,7 +33,15 @@ router.get('/', async (req: Request<{}, {}, {}, UserPrams>, res, next) => {
 
 router.get('/find', async (req: Request<{}, {}, {}, UserPrams>, res, next) => {
     const {name} = req.query
-    const users = await prisma.user.findMany({where: {name: {contains: name}}})
+    const min = parseInt(req.query.min || '')
+    const max = parseInt(req.query.max || '')
+
+    const users = await prisma.user.findMany({where: {
+        AND: [
+            {name: {contains: name}},
+            {age: {gte: min, lte: max}}, // min以上 max以下
+        ]
+    }})
     res.render('users/index', {
         title: 'Users/Find',
         content: users
