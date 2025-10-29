@@ -15,16 +15,26 @@ const prisma = new PrismaClient({adapter})
 
 interface UserPrams {
     id?: string
+    name?: string
 }
 
 router.get('/', async (req: Request<{}, {}, {}, UserPrams>, res, next) => {
     const id = parseInt(req.query.id || '')
-    const users = await (id ? prisma.user.findMany({where: {id}}) // {id: id} 変数名とキー名が同じ場合は省略可能
+    const users = await (id ? prisma.user.findMany({where: {id: {lte: id}}}) // 指定したid以下 less than or equal
         : prisma.user.findMany())
 
     res.render('users/index', {
         title: 'Users/Index',
         content: users,
+    })
+})
+
+router.get('/find', async (req: Request<{}, {}, {}, UserPrams>, res, next) => {
+    const {name} = req.query
+    const users = await prisma.user.findMany({where: {name: {contains: name}}})
+    res.render('users/index', {
+        title: 'Users/Find',
+        content: users
     })
 })
 
