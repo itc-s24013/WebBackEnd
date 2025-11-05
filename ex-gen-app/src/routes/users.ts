@@ -62,4 +62,24 @@ router.post('/add', async (req, res, next)=> {
     res.redirect('/users')
 })
 
+router.get('/edit/:id', async (req, res, next) => {
+    const id = parseInt(req.params.id)
+    const user = await prisma.user.findUnique({where: {id}})
+    res.render('users/edit', {
+        title: 'Users/Edit',
+        user
+    })
+})
+
+router.post('/edit', async (req, res, next) => {
+    const id = parseInt(req.body.id)
+    const {name, pass, mail} = req.body
+    const age = parseInt(req.body.age)
+    await prisma.user.update({
+        where: {id},
+        data: {name, pass, mail, age}
+    })
+    res.redirect('/users')
+})
+
 export default router
