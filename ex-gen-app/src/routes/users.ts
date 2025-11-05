@@ -19,13 +19,20 @@ interface UserPrams {
     min?: string
     max?: string
     mail?: string
+    page?: string
 }
 
+const PAGE_SIZE = 3
+
 router.get('/', async (req: Request<{}, {}, {}, UserPrams>, res, next) => {
+    const page = req.query.page && parseInt(req.query.page) > 0 ?
+        parseInt(req.query.page) : 1
     const users = await prisma.user.findMany({
         orderBy: [
-            {name: 'asc'}
-        ]
+            {id: 'asc'}
+        ],
+        skip: (page -1) * PAGE_SIZE,
+        take: PAGE_SIZE
     })
     res.render('users/index', {
         title: 'Users/Index',
