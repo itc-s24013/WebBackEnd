@@ -53,4 +53,13 @@ router.get('/add', async (req, res, next) => {
     })
 })
 
+router.post('/add', async (req, res, next)=> {
+    const {name, pass, mail} = req.body
+    const age = parseInt(req.body.age)
+    await prisma.user.create({
+        data: {name, pass, mail, age}
+    })
+    res.redirect('/users')
+})
+
 export default router
