@@ -22,10 +22,11 @@ interface UserPrams {
 }
 
 router.get('/', async (req: Request<{}, {}, {}, UserPrams>, res, next) => {
-    const id = parseInt(req.query.id || '')
-    const users = await (id ? prisma.user.findMany({where: {id: {lte: id}}}) // 指定したid以下 less than or equal
-        : prisma.user.findMany())
-
+    const users = await prisma.user.findMany({
+        orderBy: [
+            {name: 'asc'}
+        ]
+    })
     res.render('users/index', {
         title: 'Users/Index',
         content: users,
