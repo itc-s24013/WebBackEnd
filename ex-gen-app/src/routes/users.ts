@@ -1,6 +1,6 @@
 import {Router, Request} from 'express'
 import {PrismaMariaDb} from '@prisma/adapter-mariadb'
-import {PrismaClient} from 'db'
+import {Prisma, PrismaClient} from 'db'
 
 const router = Router()
 const adapter = new PrismaMariaDb({
@@ -20,20 +20,31 @@ interface UserPrams {
     max?: string
     mail?: string
     page?: string
+    prev?: string
+    next?: string
 }
 
 const PAGE_SIZE = 3
 
 router.get('/', async (req: Request<{}, {}, {}, UserPrams>, res, next) => {
-    const page = req.query.page && parseInt(req.query.page) > 0 ?
-        parseInt(req.query.page) : 1
-    const users = await prisma.user.findMany({
+    const conditions: Prisma.UserFindManyArgs = {
         orderBy: [
-            {id: 'asc'}
+            {id: 'asc'},
         ],
-        skip: (page -1) * PAGE_SIZE,
         take: PAGE_SIZE
-    })
+    }
+    const {prev: prevCursor, next: nextCursor} = req.query
+    if (nextCursor) {
+        conditions.cursor = {id: parseInt(nextCursor)}
+        conditions.skip = 1 // skipでカーソルの分を飛ばす
+    }
+    if (prevCursor) {
+        // 戻るボタンのときは take をマイナスにすると逆順で遡ってとってきてくれる
+        conditions.take = -PAGE_SIZE
+        conditions.cursor = {id: parseInt(prevCursor)}
+        conditions.skip = 1
+    }
+    const users = await prisma.user.findMany(conditions)
     res.render('users/index', {
         title: 'Users/Index',
         content: users,
