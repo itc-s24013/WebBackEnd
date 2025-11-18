@@ -1,0 +1,31 @@
+extends ../layout
+
+
+prepend head
+  - const title = 'Register'
+
+
+block header
+  h1(class=['text-5xl/14', 'font-light', 'mb-4']) 新規登録
+
+
+block content
+  form(method='post' action='/users/register' class=['max-w-sm', 'mx-auto'])
+    .form-group
+      input(type='email' name='email' id='email' placeholder=''
+        autocomplete='off').peer
+      label(for='email') メールアドレス
+    .form-group
+      input(type='name' name='name' id='name' placeholder=''
+        autocomplete='off').peer
+      label(for='name') 名前
+    .form-group
+      input(type='password' name='password' id='password'
+        placeholder='').peer
+      label(for='password') パスワード
+    button(type='submit').submit-button 登録
+
+
+  if error
+    p(class=['mt-6', 'text-sm', 'text-red-600', 'dark:text-red-400',
+      'text-center'])= error

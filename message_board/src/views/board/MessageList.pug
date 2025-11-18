@@ -1,0 +1,9 @@
+mixin MessageList(posts=[])
+  section(class=['max-w-lg', 'mt-2', 'space-y-3','divide-y', 'divide-gray-300'])
+    each post in posts
+      div(class=['grid', 'grid-cols-7', 'space-y-2'])
+        p(class=['font-bold', 'text-sm/tight',])
+          a(href=`/board/user/${post.user.id}`
+            class=['underline', 'hover:text-blue-600'])= post.user.name
+        p(class=['text-sm/tight', 'col-span-4'])= post.message
+        p(class=['text-sm/tight', 'col-span-2'])= dateFormat(post.createdAt)

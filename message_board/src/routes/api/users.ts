@@ -1,25 +1,23 @@
 import {Router} from 'express'
-import passport from '../libs/auth.js'
+import passport from '../../libs/auth.js'
 import {check, validationResult} from "express-validator";
-import prisma from "../libs/db.js";
+import prisma from "../../libs/db.js";
 import argon2 from "argon2";
+
 
 const router = Router()
 
-/* Get users listing. */
-router.get('/login', async (req, res) => {
-  res.render('users/login', {
-    error: (req.session.messages || []).pop()
-  })
-})
 
 router.post('/login',
   passport.authenticate('local', {
-    successRedirect: '/board',
-    failureRedirect: '/users/login',
     failureMessage: true,
     badRequestMessage: 'ユーザー名とパスワードを入力してください'
-  }))
+  }),
+  async (req, res) => {
+    res.json({message: 'login ok'})
+  }
+)
+
 
 router.get('/logout', async (req, res) => {
   req.logout(err => {
@@ -29,6 +27,7 @@ router.get('/logout', async (req, res) => {
     res.redirect('/users/login')
   })
 })
+
 
 router.get('/register', async (req, res) => {
   res.render('users/register')
@@ -65,5 +64,4 @@ router.post('/register',
       res.redirect('/board')
     })
   })
-
 export default router

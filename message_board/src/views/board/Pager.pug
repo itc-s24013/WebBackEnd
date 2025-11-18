@@ -1,0 +1,36 @@
+mixin Pager(current, maxPage, baseUrl='/')
+  .flex.mt-6.justify-center.max-w-xl
+    // Previous Button
+    if current > 1
+      a(href=`${baseUrl}/${current - 1}`).previous-button
+        +prevSvg
+        | 前へ
+    else
+      p.previous-button.disabled
+        +prevSvg
+        | 前へ
+    // Next Button
+    if current < maxPage
+      a(href=`${baseUrl}/${current + 1}`).next-button
+        | 次へ
+        +nextSvg
+    else
+      p.next-button.disabled
+        | 次へ
+        +nextSvg
+
+mixin prevSvg
+  svg(class=['w-3.5', 'h-3.5', 'me-2', 'rtl:rotate-180', 'fill-none']
+    aria-hidden='true' xmlns='http://www.w3.org/2000/svg'
+    viewBox='0 0 14 10')
+    path(stroke='currentColor' stroke-linecap='round'
+      stroke-linejoin='round' stroke-width='2'
+      d='M13 5H1m0 0 4 4M1 5l4-4')
+
+mixin nextSvg
+  svg(class=['w-3.5', 'h-3.5', 'ms-2', 'rtl:rotate-180', 'fill-none']
+    aria-hidden='true' xmlns='http://www.w3.org/2000/svg'
+    viewBox='0 0 14 10')
+    path(stroke='currentColor' stroke-linecap='round'
+      stroke-linejoin='round' stroke-width='2'
+      d='M1 5h12m0 0L9 1m4 4L9 9')
