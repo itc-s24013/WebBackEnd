@@ -45,11 +45,14 @@ router.post('/register',
       req.session.messages = ['登録に失敗しました']
       return res.redirect('/users/register')
     }
+    console.log("hashing password")
     const hashedPassword = await argon2.hash(req.body.password, {
       timeCost: 2,
       memoryCost: 19456,
       parallelism: 1
     })
+    console.log("password hashed")
+    console.log("new user create start")
     const newUser = await prisma.user.create({
       data: {
         email: req.body.email,
@@ -57,6 +60,7 @@ router.post('/register',
         password: hashedPassword
       }
     })
+    console.log("new user created:")
     const user: Express.User = {id: newUser.id, name: newUser.name}
     req.login(user, err => {
       if (err) {
